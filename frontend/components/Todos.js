@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleShowCompletedTodos } from '../state/todosSlice';
-import { useGetTodosQuery } from '../state/todosApi';
+import { useGetTodosQuery, useToggleTodoMutation } from '../state/todosApi';
 
 const StyledTodo = styled.li`
 	text-decoration: ${(pr) => (pr.$complete ? 'line-through' : 'initial')};
@@ -12,6 +12,7 @@ const StyledTodo = styled.li`
 export default function Todo() {
 	// rtk query
 	const { data: todos } = useGetTodosQuery();
+	const [toggleTodo] = useToggleTodoMutation();
 	// redux
 	const showCompletedTodos = useSelector(
 		(st) => st.todosState.showCompletedTodos
@@ -27,8 +28,15 @@ export default function Todo() {
 						return showCompletedTodos || !todo.complete;
 					})
 					.map((todo) => {
+						const onToggle = () => {
+							toggleTodo({
+								id: todo.id,
+								todo: { complete: !todo.complete },
+							});
+						};
 						return (
 							<StyledTodo
+								onClick={onToggle}
 								$complete={todo.complete}
 								key={todo.id}
 							>

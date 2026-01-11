@@ -7,7 +7,13 @@ export const todosApi = createApi({
 		getTodos: build.query({
 			query: () => 'todos',
 		}),
-		toggleTodo: build.mutation({}),
+		toggleTodo: build.mutation({
+			query: ({ id, todo }) => ({
+				url: `todos/${id}`,
+				method: 'PUT',
+				body: todo,
+			}),
+		}),
 		createTodo: build.mutation({}),
 	}),
 });
