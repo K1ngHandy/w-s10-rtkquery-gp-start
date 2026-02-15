@@ -21,7 +21,8 @@ const reducer = (state, action) => {
 
 export default function TodoForm() {
 	const [state, dispatch] = useReducer(reducer, initialState);
-	const [createTodo] = useCreateTodoMutation();
+	const [createTodo, { error: createTodoError, isLoading }] =
+		useCreateTodoMutation();
 
 	const onLabelChange = ({ target: { value } }) => {
 		dispatch({ type: CHANGE_LABEL, payload: value });
@@ -37,8 +38,12 @@ export default function TodoForm() {
 	const onNewTodo = async (evt) => {
 		evt.preventDefault();
 		const { todoLabel: label, todoIsCompleted: complete } = state;
-		createTodo({ label, complete });
-		resetForm();
+		createTodo({ label, complete })
+			.unwrap()
+			.then(() => {
+				resetForm();
+			})
+			.catch((err) => {});
 	};
 
 	return (
@@ -46,8 +51,10 @@ export default function TodoForm() {
 			id="todoForm"
 			onSubmit={onNewTodo}
 		>
-			<div className="error"></div>
-			<h3>New Todo Form</h3>
+			<div className="error">
+				{createTodoError && createTodoError.data?.message}
+			</div>
+			<h3>New Todo {isLoading && 'being created...'}</h3>
 			<label>
 				<span>Todo label:</span>
 				<input

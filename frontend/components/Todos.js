@@ -11,42 +11,53 @@ const StyledTodo = styled.li`
 
 export default function Todo() {
 	// rtk query
-	const { data: todos } = useGetTodosQuery();
-	const [toggleTodo] = useToggleTodoMutation();
+	const {
+		data: todos,
+		isLoading: todosLoading,
+		isFetching: todosRefreshing,
+	} = useGetTodosQuery();
+	const [toggleTodo, { error: toggleError, isLoading: todosToggling }] =
+		useToggleTodoMutation();
 	// redux
 	const showCompletedTodos = useSelector(
-		(st) => st.todosState.showCompletedTodos
+		(st) => st.todosState.showCompletedTodos,
 	);
 	const dispatch = useDispatch();
 	return (
 		<div id="todos">
-			<div className="error"></div>
-			<h3>Todos</h3>
+			<div className="error">
+				{toggleError && toggleError.data.message}
+			</div>
+			<h3>
+				Todos {todosToggling || (todosRefreshing && 'being updated...')}
+			</h3>
 			<ul>
-				{todos
-					?.filter((todo) => {
-						return showCompletedTodos || !todo.complete;
-					})
-					.map((todo) => {
-						const onToggle = () => {
-							toggleTodo({
-								id: todo.id,
-								todo: { complete: !todo.complete },
-							});
-						};
-						return (
-							<StyledTodo
-								onClick={onToggle}
-								$complete={todo.complete}
-								key={todo.id}
-							>
-								<span>
-									{todo.label}
-									{todo.complete && ' ✔️'}
-								</span>
-							</StyledTodo>
-						);
-					})}
+				{todosLoading
+					? 'Loading todos...'
+					: todos
+							?.filter((todo) => {
+								return showCompletedTodos || !todo.complete;
+							})
+							.map((todo) => {
+								const onToggle = () => {
+									toggleTodo({
+										id: todo.id,
+										todo: { complete: !todo.complete },
+									});
+								};
+								return (
+									<StyledTodo
+										onClick={onToggle}
+										$complete={todo.complete}
+										key={todo.id}
+									>
+										<span>
+											{todo.label}
+											{todo.complete && ' ✔️'}
+										</span>
+									</StyledTodo>
+								);
+							})}
 			</ul>
 			<button onClick={() => dispatch(toggleShowCompletedTodos())}>
 				{showCompletedTodos ? 'Hide' : 'Show'} completed todos
