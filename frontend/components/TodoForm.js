@@ -51,9 +51,7 @@ export default function TodoForm() {
 			id="todoForm"
 			onSubmit={onNewTodo}
 		>
-			<div className="error">
-				{createTodoError && createTodoError.data?.message}
-			</div>
+			<div className="error">{createTodoError?.data?.message}</div>
 			<h3>New Todo {isLoading && 'being created...'}</h3>
 			<label>
 				<span>Todo label:</span>

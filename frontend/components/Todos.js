@@ -25,9 +25,7 @@ export default function Todo() {
 	const dispatch = useDispatch();
 	return (
 		<div id="todos">
-			<div className="error">
-				{toggleError && toggleError.data.message}
-			</div>
+			<div className="error">{toggleError?.data?.message}</div>
 			<h3>
 				Todos {todosToggling || (todosRefreshing && 'being updated...')}
 			</h3>
